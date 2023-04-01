@@ -1,4 +1,4 @@
-module github.com/tasm20/go-vault-get
+module github.com/tasm20/go-vault-search
 
 go 1.20
 
