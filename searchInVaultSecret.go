@@ -17,7 +17,7 @@ func searchInVaultSecret(client *vault.Client, searchItem string, searchKey bool
 
 		vaultSecretPath := strings.Split(secret, "/")
 		searchPath := vaultSecretPath[0]
-		vaultSecret := strings.Replace(secret, "kv/metadata//", "", 1)
+		vaultSecret := strings.Replace(secret, "kv/metadata/", "", 1)
 		vaultSecret = strings.Replace(vaultSecret, "//", "/", -1)
 
 		if searchKey {
@@ -37,6 +37,7 @@ func searchInVaultSecret(client *vault.Client, searchItem string, searchKey bool
 				if strings.Contains(secretString, searchItem) {
 					coloredResult := strings.Replace(secretString, searchItem, coloredSearchItem, -1)
 					result := searchPath + "/" + vaultSecret + " - " + k + " = " + coloredResult
+					result = strings.Replace(result, "//", "/", -1)
 					found = append(found, result)
 				}
 			}

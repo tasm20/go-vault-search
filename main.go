@@ -49,7 +49,6 @@ func main() {
 	if !strings.Contains(*vaultPath, "metadata") {
 		pathString = strings.Replace(*vaultPath, "kv", "kv/metadata", 1)
 	}
-	fmt.Println(pathString)
 
 	path = append(path, pathString)
 
