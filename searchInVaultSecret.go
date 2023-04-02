@@ -20,31 +20,35 @@ func searchInVaultSecret(client *vault.Client, searchItem string, searchKey bool
 		vaultSecret := strings.Replace(secret, "kv/metadata/", "", 1)
 		vaultSecret = strings.Replace(vaultSecret, "//", "/", -1)
 
-		if searchKey {
-			if strings.Contains(secret, searchItem) {
-				secret = strings.Replace(secret, "//", "/", -1)
-				coloredResult := strings.Replace(secret, searchItem, coloredSearchItem, -1)
-				fmt.Println(coloredResult)
-				found = append(found, coloredResult)
-			}
-		} else {
-			check, err := client.KVv2(searchPath).Get(ctx, vaultSecret)
-			if err != nil {
-				return 0, err
-			}
+		check, err := client.KVv2(searchPath).Get(ctx, vaultSecret)
+		if err != nil {
+			return 0, err
+		}
 
-			for k, v := range check.Data {
-				secretString := fmt.Sprintf("%v", v)
-				if strings.Contains(secretString, searchItem) {
+		for k, v := range check.Data {
+			if searchKey {
+				if strings.Contains(k, searchItem) {
 					k = fmt.Sprintf("\u001B[%dm%s\u001B[0m", 33, k)
-					coloredResult := strings.Replace(secretString, searchItem, coloredSearchItem, -1)
-					result := searchPath + "/" + vaultSecret + " - " + k + " = " + coloredResult
+					result := searchPath + "/" + vaultSecret + " - " + k
 					result = strings.Replace(result, "//", "/", -1)
 					fmt.Println(result)
 					found = append(found, result)
+
+					continue
 				}
 			}
+
+			secretString := fmt.Sprintf("%v", v)
+			if strings.Contains(secretString, searchItem) {
+				k = fmt.Sprintf("\u001B[%dm%s\u001B[0m", 33, k)
+				coloredResult := strings.Replace(secretString, searchItem, coloredSearchItem, -1)
+				result := searchPath + "/" + vaultSecret + " - " + k + " = " + coloredResult
+				result = strings.Replace(result, "//", "/", -1)
+				fmt.Println(result)
+				found = append(found, result)
+			}
 		}
+
 	}
 
 	if len(found) > 0 {
