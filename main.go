@@ -44,7 +44,7 @@ func main() {
 	}
 
 	pathString := *vaultPath
-	if !strings.Contains(*vaultPath, "metadata") {
+	if !strings.Contains(pathString, "metadata") {
 		pathString = strings.Replace(pathString, "kv", "kv/metadata", 1)
 	}
 
