@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	version string = "0.2.1"
+	version string = "0.2.2"
 )
 
 func main() {
@@ -45,7 +45,7 @@ func main() {
 
 	pathString := *vaultPath
 	if !strings.Contains(*vaultPath, "metadata") {
-		pathString = strings.Replace(*vaultPath, "kv", "kv/metadata", 1)
+		pathString = strings.Replace(pathString, "kv", "kv/metadata", 1)
 	}
 
 	path = append(path, pathString)
@@ -59,7 +59,8 @@ func main() {
 	fmt.Println()
 
 	if *listVaults {
-		fmt.Printf("found dirs in %s:\n", *vaultPath)
+		pathString = strings.Replace(pathString, "metadata/", "", 1)
+		fmt.Printf("found dirs in %s:\n", pathString)
 		for _, secret := range secrets {
 			fmt.Printf("\t%s\n", secret)
 		}
