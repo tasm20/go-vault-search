@@ -8,16 +8,17 @@ import (
 )
 
 const (
-	version string = "0.1.2"
+	version string = "0.2.0"
 )
 
 func main() {
 	var path []string
 
 	showVersion := flag.Bool("v", false, "version")
-	vaultPath := flag.String("p", "kv/metadata/", "path to vault secret start searching")
+	vaultPath := flag.String("p", "kv/", "path to vault secret start searching")
 	searchItem := flag.String("s", "", "what to search")
 	searchKey := flag.Bool("k", false, "search secret key instead secret value")
+	listVaults := flag.Bool("l", false, "show only list of vaults in path")
 
 	flag.Parse()
 
@@ -31,7 +32,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	if *searchItem == "" {
+	if *searchItem == "" && !*listVaults {
 		fmt.Println("Use", os.Args[0], "-s string to search")
 		os.Exit(1)
 	}
@@ -49,13 +50,23 @@ func main() {
 
 	path = append(path, pathString)
 
-	err = getListVault(client, path)
+	err = getListVault(client, path, *listVaults)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(2)
 	}
 
 	fmt.Println()
+
+	if *listVaults {
+		for _, secret := range secrets {
+			secret = strings.Replace(secret, "metadata/", "", 1)
+			secret = strings.Replace(secret, "//", "/", 1)
+			fmt.Println(secret)
+		}
+		fmt.Printf("\nfound %d keys\n", len(secrets))
+		os.Exit(0)
+	}
 
 	found, err := searchInVaultSecret(client, *searchItem, *searchKey)
 	if err != nil {

@@ -9,7 +9,7 @@ import (
 
 var secrets []string
 
-func getListVault(client *vault.Client, vaultPath []string) error {
+func getListVault(client *vault.Client, vaultPath []string, listVaults bool) error {
 	var dirs []string
 
 	for _, path := range vaultPath {
@@ -23,13 +23,28 @@ func getListVault(client *vault.Client, vaultPath []string) error {
 			return err
 		}
 
+		if listVaults {
+			for _, listMap := range vaultList.Data {
+				switch reflect.TypeOf(listMap).Kind() {
+				case reflect.Slice:
+					searchPathMap := reflect.ValueOf(listMap)
+
+					for i := 0; i < searchPathMap.Len(); i++ {
+						pathString := path + "/" + searchPathMap.Index(i).Interface().(string)
+						secrets = append(secrets, pathString)
+					}
+				}
+			}
+			return nil
+		}
+
 		secretsList, dirsList := loop(path, vaultList)
 		secrets = append(secrets, secretsList...)
 		dirs = append(dirs, dirsList...)
 	}
 
 	if len(dirs) > 0 {
-		_ = getListVault(client, dirs)
+		_ = getListVault(client, dirs, false)
 	}
 
 	return nil
