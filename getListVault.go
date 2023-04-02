@@ -30,7 +30,7 @@ func getListVault(client *vault.Client, vaultPath []string, listVaults bool) err
 					searchPathMap := reflect.ValueOf(listMap)
 
 					for i := 0; i < searchPathMap.Len(); i++ {
-						pathString := path + "/" + searchPathMap.Index(i).Interface().(string)
+						pathString := searchPathMap.Index(i).Interface().(string)
 						secrets = append(secrets, pathString)
 					}
 				}

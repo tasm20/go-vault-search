@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	version string = "0.2.0"
+	version string = "0.2.1"
 )
 
 func main() {
@@ -59,10 +59,9 @@ func main() {
 	fmt.Println()
 
 	if *listVaults {
+		fmt.Printf("found dirs in %s:\n", *vaultPath)
 		for _, secret := range secrets {
-			secret = strings.Replace(secret, "metadata/", "", 1)
-			secret = strings.Replace(secret, "//", "/", 1)
-			fmt.Println(secret)
+			fmt.Printf("\t%s\n", secret)
 		}
 		fmt.Printf("\nfound %d keys\n", len(secrets))
 		os.Exit(0)
