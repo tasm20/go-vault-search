@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func searchInVaultSecret(client *vault.Client, searchItem string, searchKey bool) ([]string, error) {
+func searchInVaultSecret(client *vault.Client, searchItem string, searchKey bool) (int, error) {
 	var found []string
 	ctx := context.Background()
 	dataNotFound := fmt.Errorf("\x1b[%dm%s\x1b[0m", 31, "DATA NOT FOUND")
@@ -24,20 +24,23 @@ func searchInVaultSecret(client *vault.Client, searchItem string, searchKey bool
 			if strings.Contains(secret, searchItem) {
 				secret = strings.Replace(secret, "//", "/", -1)
 				coloredResult := strings.Replace(secret, searchItem, coloredSearchItem, -1)
+				fmt.Println(coloredResult)
 				found = append(found, coloredResult)
 			}
 		} else {
 			check, err := client.KVv2(searchPath).Get(ctx, vaultSecret)
 			if err != nil {
-				return nil, err
+				return 0, err
 			}
 
 			for k, v := range check.Data {
-				secretString := v.(string)
+				secretString := fmt.Sprintf("%v", v)
 				if strings.Contains(secretString, searchItem) {
+					k = fmt.Sprintf("\u001B[%dm%s\u001B[0m", 33, k)
 					coloredResult := strings.Replace(secretString, searchItem, coloredSearchItem, -1)
 					result := searchPath + "/" + vaultSecret + " - " + k + " = " + coloredResult
 					result = strings.Replace(result, "//", "/", -1)
+					fmt.Println(result)
 					found = append(found, result)
 				}
 			}
@@ -45,8 +48,8 @@ func searchInVaultSecret(client *vault.Client, searchItem string, searchKey bool
 	}
 
 	if len(found) > 0 {
-		return found, nil
+		return len(found), nil
 	}
 
-	return nil, dataNotFound
+	return 0, dataNotFound
 }

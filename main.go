@@ -5,16 +5,13 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 )
 
 const (
-	version string = "0.1.0"
+	version string = "0.1.1"
 )
 
 func main() {
-	startTime := time.Now()
-	duration := time.Since(startTime)
 	var path []string
 
 	showVersion := flag.Bool("v", false, "version")
@@ -58,18 +55,12 @@ func main() {
 		os.Exit(2)
 	}
 
+	fmt.Println()
+
 	found, err := searchInVaultSecret(client, *searchItem, *searchKey)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	foundCount := len(found)
-
-	fmt.Println()
-
-	for _, v := range found {
-		fmt.Println(v)
-	}
-
-	fmt.Printf("\nfound %d in %s\n", foundCount, duration)
+	fmt.Printf("\nfound %d\n", found)
 }
