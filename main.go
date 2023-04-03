@@ -8,11 +8,14 @@ import (
 )
 
 const (
-	version string = "0.2.3"
+	version string = "0.3.0"
 )
 
+// TODO: do search by folder/file
+
 var (
-	searchKey *bool
+	searchKey   *bool
+	searchSlice []string
 )
 
 func main() {
@@ -72,7 +75,11 @@ func main() {
 		os.Exit(0)
 	}
 
-	found, err := searchInVaultSecret(client, *searchItem)
+	searchArgs := flag.Args()
+	searchSlice = append(searchSlice, *searchItem)
+	searchSlice = append(searchSlice, searchArgs...)
+
+	found, err := searchInVaultSecret(client)
 	if err != nil {
 		fmt.Println(err)
 	}
