@@ -13,24 +13,31 @@ Usage of go-vault-search:
 
 ## example
 ```
-❯ ./go-vault-get -s 124
-kv/TEST - third = 124
+❯ go-vault-search -s 124
+
+kv/TEST - third = qwe124
 kv/TEST2 - third = 124
 kv/TEST23 - third = 124
-kv/localtest - localvar = local124
-duration  166ns
+
+found 3
 ```
 &
 ```
-❯ ./go-vault-get -s 122 -p kv/TEST2
-kv/TEST2/tt - foru = 122
-duration  167ns
+❯ go-vault-search -s 125 -p kv/TEST2
+
+kv/TEST2/tt - foru = 125
+
+found 1
 ```
 &
 ```
-❯ ./go-vault-get -s qwe -p kv/TEST2 -k
-kv/TEST2/qwe
-duration  375ns
+❯ go-vault-search -k -s for -p kv/
+
+kv/TEST2/tt - foru = 125
+kv/TEST3/t2/qwe - for = 122
+kv/TEST3/tt/qwe - foru = 122
+
+found 3
 ```
 &
 ```
@@ -38,14 +45,18 @@ duration  375ns
 
 kv/TEST2/tt
 
-found 1 keys
+found 1
 
-
+```
+```
 ❯ go-vault-search -l
 
-kv/TEST
-kv/TEST2
-kv/TEST2/
-kv/TEST23
-kv/TEST3/
+found dirs in kv/:
+	TEST
+	TEST2
+	TEST2/
+	TEST23
+	TEST3/
+
+found 5
 ```

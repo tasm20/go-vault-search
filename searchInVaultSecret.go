@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func searchInVaultSecret(client *vault.Client, searchItem string, searchKey bool) (int, error) {
+func searchInVaultSecret(client *vault.Client, searchItem string) (int, error) {
 	var found []string
 	ctx := context.Background()
 	dataNotFound := fmt.Errorf("\x1b[%dm%s\x1b[0m", 31, "DATA NOT FOUND")
@@ -26,16 +26,19 @@ func searchInVaultSecret(client *vault.Client, searchItem string, searchKey bool
 		}
 
 		for k, v := range check.Data {
-			if searchKey {
+			k = fmt.Sprintf("\u001B[%dm%s\u001B[0m", 31, k)
+
+			if *searchKey {
+				//if searchByKey(k) {
 				if strings.Contains(k, searchItem) {
-					k = fmt.Sprintf("\u001B[%dm%s\u001B[0m", 33, k)
-					result := searchPath + "/" + vaultSecret + " - " + k
-					result = strings.Replace(result, "//", "/", -1)
+					secretValue := fmt.Sprintf("%v", v)
+					result := searchPath + "/" + vaultSecret + " - " + k + " = " + secretValue
+					result = strings.Replace(result, "//", "/", 1)
 					fmt.Println(result)
 					found = append(found, result)
-
-					continue
 				}
+
+				continue
 			}
 
 			secretString := fmt.Sprintf("%v", v)
@@ -57,3 +60,8 @@ func searchInVaultSecret(client *vault.Client, searchItem string, searchKey bool
 
 	return 0, dataNotFound
 }
+
+// TODO: do a multiple key search
+//func searchByKey(key string) bool {
+//	return false
+//}

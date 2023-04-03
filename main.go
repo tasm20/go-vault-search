@@ -8,7 +8,11 @@ import (
 )
 
 const (
-	version string = "0.2.2"
+	version string = "0.2.3"
+)
+
+var (
+	searchKey *bool
 )
 
 func main() {
@@ -17,7 +21,7 @@ func main() {
 	showVersion := flag.Bool("v", false, "version")
 	vaultPath := flag.String("p", "kv/", "path to vault secret start searching")
 	searchItem := flag.String("s", "", "what to search")
-	searchKey := flag.Bool("k", false, "search secret key instead secret value")
+	searchKey = flag.Bool("k", false, "search secret key instead secret value")
 	listVaults := flag.Bool("l", false, "show only list of vaults in path")
 
 	flag.Parse()
@@ -64,11 +68,11 @@ func main() {
 		for _, secret := range secrets {
 			fmt.Printf("\t%s\n", secret)
 		}
-		fmt.Printf("\nfound %d keys\n", len(secrets))
+		fmt.Printf("\nfound %d \n", len(secrets))
 		os.Exit(0)
 	}
 
-	found, err := searchInVaultSecret(client, *searchItem, *searchKey)
+	found, err := searchInVaultSecret(client, *searchItem)
 	if err != nil {
 		fmt.Println(err)
 	}
