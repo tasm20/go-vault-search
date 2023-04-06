@@ -3,12 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	vault "github.com/hashicorp/vault/api"
 	"os"
 	"strings"
 )
 
 const (
-	version string = "0.3.1"
+	version string = "0.3.2"
 )
 
 // TODO: do search by folder/file
@@ -16,7 +17,17 @@ const (
 var (
 	searchKey   *bool
 	searchSlice []string
+	foundCount  int
 )
+
+func checkFolder(client *vault.Client) bool {
+	err := searchInVaultSecret(client)
+	if err != nil {
+		return false
+	}
+
+	return true
+}
 
 func main() {
 	var path []string
@@ -51,19 +62,37 @@ func main() {
 	}
 
 	pathString := *vaultPath
+
 	if !strings.Contains(pathString, "metadata") {
 		pathString = strings.Replace(pathString, "kv", "kv/metadata", 1)
 	}
 
-	path = append(path, pathString)
-
-	err = getListVault(client, path, *listVaults)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(2)
-	}
+	searchSlice = append(searchSlice, *searchItem)
+	secrets = append(secrets, pathString)
 
 	fmt.Println()
+
+	pathToSecret := checkFolder(client)
+
+	if !pathToSecret {
+		secrets = nil
+		pathString = pathString + "/"
+		path = append(path, pathString)
+
+		searchArgs := flag.Args()
+		searchSlice = append(searchSlice, searchArgs...)
+
+		err = getListVault(client, path, *listVaults)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(2)
+		}
+
+		err = searchInVaultSecret(client)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
 
 	if *listVaults {
 		pathString = strings.Replace(pathString, "metadata/", "", 1)
@@ -75,14 +104,5 @@ func main() {
 		os.Exit(0)
 	}
 
-	searchArgs := flag.Args()
-	searchSlice = append(searchSlice, *searchItem)
-	searchSlice = append(searchSlice, searchArgs...)
-
-	found, err := searchInVaultSecret(client)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	fmt.Printf("\nfound %d\n", found)
+	fmt.Printf("\nfound %d\n", foundCount)
 }

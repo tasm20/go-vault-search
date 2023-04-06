@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func searchInVaultSecret(client *vault.Client) (int, error) {
+func searchInVaultSecret(client *vault.Client) error {
 	var found []string
 	ctx := context.Background()
 	dataNotFound := fmt.Errorf("\x1b[%dm%s\x1b[0m", 31, "DATA NOT FOUND")
@@ -21,7 +21,7 @@ func searchInVaultSecret(client *vault.Client) (int, error) {
 
 		check, err := client.KVv2(searchPath).Get(ctx, vaultSecret)
 		if err != nil {
-			return 0, err
+			return err
 		}
 
 		for k, v := range check.Data {
@@ -79,10 +79,11 @@ func searchInVaultSecret(client *vault.Client) (int, error) {
 	}
 
 	if len(found) > 0 {
-		return len(found), nil
+		foundCount = len(found)
+		return nil
 	}
 
-	return 0, dataNotFound
+	return dataNotFound
 }
 
 func searchInSlice(key string) (string, bool) {
