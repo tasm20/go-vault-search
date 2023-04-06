@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	version string = "0.3.0"
+	version string = "0.3.1"
 )
 
 // TODO: do search by folder/file

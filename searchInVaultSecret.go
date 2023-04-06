@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	vault "github.com/hashicorp/vault/api"
 	"strings"
@@ -24,8 +25,32 @@ func searchInVaultSecret(client *vault.Client) (int, error) {
 		}
 
 		for k, v := range check.Data {
+			if rec, ok := v.(map[string]interface{}); ok {
+				for kk, vv := range rec {
+					secretKey := fmt.Sprintf("\u001B[%dm%s\u001B[0m", 31, kk)
+					jStr, err := json.MarshalIndent(vv, "", " ")
+					if err != nil {
+						fmt.Println(err)
+					}
+
+					_, ok := searchInSlice(secretKey)
+					if ok {
+						result := searchPath + "/" + vaultSecret + " - " + secretKey + " = " + string(jStr)
+						result = strings.Replace(result, "//", "/", 1)
+						fmt.Println(result)
+						found = append(found, result)
+					}
+				}
+				continue
+			}
+
+			jStr, err := json.MarshalIndent(v, "", " ")
+			if err != nil {
+				fmt.Println(err)
+			}
+
 			secretKey := fmt.Sprintf("\u001B[%dm%s\u001B[0m", 31, k)
-			secretValue := fmt.Sprintf("%v", v)
+			secretValue := string(jStr)
 
 			if *searchKey {
 				_, ok := searchInSlice(secretKey)

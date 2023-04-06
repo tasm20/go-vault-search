@@ -1,6 +1,7 @@
 # **working with only v2 secrets at this moment**
 # Do a search through vault secrets by a search string
 ## keys "-k" or "-l" need to be place in begin
+## and key "**_-s_**" (search item) should be in the end (have a trouble with args)
 ```
 Usage of go-vault-search:
   -k	search secret key instead secret value
