@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	version string = "0.3.2"
+	version string = "0.3.3"
 )
 
 // TODO: do search by folder/file
@@ -68,6 +68,8 @@ func main() {
 	}
 
 	searchSlice = append(searchSlice, *searchItem)
+	searchArgs := flag.Args()
+	searchSlice = append(searchSlice, searchArgs...)
 	secrets = append(secrets, pathString)
 
 	fmt.Println()
@@ -78,9 +80,6 @@ func main() {
 		secrets = nil
 		pathString = pathString + "/"
 		path = append(path, pathString)
-
-		searchArgs := flag.Args()
-		searchSlice = append(searchSlice, searchArgs...)
 
 		err = getListVault(client, path, *listVaults)
 		if err != nil {
