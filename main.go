@@ -3,39 +3,39 @@ package main
 import (
 	"flag"
 	"fmt"
-	vault "github.com/hashicorp/vault/api"
 	"os"
 	"strings"
+
+	vault "github.com/hashicorp/vault/api"
 )
 
 const (
-	version string = "0.3.3"
+	version string = "0.3.4"
 )
 
-// TODO: do search by folder/file
+// TODO: do search by folder/file - done, but still need to work on it
 
 var (
-	searchKey   *bool
-	searchSlice []string
-	foundCount  int
+	searchKey    *bool
+	searchSlice  []string
+	foundCount   int
+	folderSearch *bool
 )
 
 func checkFolder(client *vault.Client) bool {
 	err := searchInVaultSecret(client)
-	if err != nil {
-		return false
-	}
-
-	return true
+	return err == nil
 }
 
 func main() {
 	var path []string
+	var dataNotFound error
 
 	showVersion := flag.Bool("v", false, "version")
 	vaultPath := flag.String("p", "kv/", "path to vault secret start searching")
 	searchItem := flag.String("s", "", "what to search")
 	searchKey = flag.Bool("k", false, "search secret key instead secret value")
+	folderSearch = flag.Bool("cat", false, "search folder or file")
 	listVaults := flag.Bool("l", false, "show only list of vaults in path")
 
 	flag.Parse()
@@ -87,10 +87,29 @@ func main() {
 			os.Exit(2)
 		}
 
-		err = searchInVaultSecret(client)
-		if err != nil {
-			fmt.Println(err)
+		dataNotFound = searchInVaultSecret(client)
+	}
+
+	if *folderSearch {
+		for _, secret := range secrets {
+			for _, searchItem := range searchSlice {
+				if strings.Contains(secret, searchItem) {
+					color := fmt.Sprintf("\u001B[%dm%s\u001B[0m", 31, searchItem)
+					resultStr := strings.Replace(secret, searchItem, color, -1)
+					resultStr = strings.Replace(resultStr, "/metadata/", "", 1)
+					resultStr = strings.Replace(resultStr, "//", "/", -1)
+
+					fmt.Println(resultStr)
+
+					dataNotFound = nil
+				}
+			}
 		}
+
+		if dataNotFound != nil {
+			fmt.Println(dataNotFound)
+		}
+		os.Exit(0)
 	}
 
 	if *listVaults {

@@ -4,6 +4,8 @@
 ## and key "**_-s_**" (search item) should be in the end (have a trouble with args)
 ```
 Usage of go-vault-search:
+  -cat
+    	search folder or file
   -k	search secret key instead secret value
   -l	show only list of vaults in path
   -p string

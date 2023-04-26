@@ -4,8 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	vault "github.com/hashicorp/vault/api"
 	"strings"
+
+	vault "github.com/hashicorp/vault/api"
 )
 
 func searchInVaultSecret(client *vault.Client) error {
@@ -41,6 +42,10 @@ func searchInVaultSecret(client *vault.Client) error {
 						found = append(found, result)
 					}
 				}
+				continue
+			}
+
+			if *folderSearch {
 				continue
 			}
 
