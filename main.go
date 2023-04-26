@@ -101,8 +101,10 @@ func main() {
 				fmt.Println(path)
 			}
 		} else {
-			fmt.Printf("folder/file %s was found in %s\n", searchSlice, pathString)
+			fmt.Printf("folder/file %s was not found in %s\n", searchSlice, pathString)
 		}
+
+		foundCount = len(folderFound)
 	}
 
 	if *listVaults {
