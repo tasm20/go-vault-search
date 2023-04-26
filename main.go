@@ -95,7 +95,7 @@ func main() {
 
 	if *folderSearch {
 		if len(folderFound) > 0 {
-			fmt.Printf("folder/file %s was found in:\n", searchSlice)
+			fmt.Printf("folder/file %s was found in:\n\n", searchSlice)
 
 			for _, path := range folderFound {
 				fmt.Println(path)
