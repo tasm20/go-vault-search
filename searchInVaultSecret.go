@@ -45,10 +45,6 @@ func searchInVaultSecret(client *vault.Client) error {
 				continue
 			}
 
-			if *folderSearch {
-				continue
-			}
-
 			jStr, err := json.MarshalIndent(v, "", " ")
 			if err != nil {
 				fmt.Println(err)

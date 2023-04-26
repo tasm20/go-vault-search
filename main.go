@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	version string = "0.3.4"
+	version string = "0.3.5"
 )
 
 // TODO: do search by folder/file - done, but still need to work on it
@@ -20,6 +20,7 @@ var (
 	searchSlice  []string
 	foundCount   int
 	folderSearch *bool
+	folderFound  []string
 )
 
 func checkFolder(client *vault.Client) bool {
@@ -86,30 +87,22 @@ func main() {
 			fmt.Println(err)
 			os.Exit(2)
 		}
+	}
 
+	if !*folderSearch && !*listVaults {
 		dataNotFound = searchInVaultSecret(client)
 	}
 
 	if *folderSearch {
-		for _, secret := range secrets {
-			for _, searchItem := range searchSlice {
-				if strings.Contains(secret, searchItem) {
-					color := fmt.Sprintf("\u001B[%dm%s\u001B[0m", 31, searchItem)
-					resultStr := strings.Replace(secret, searchItem, color, -1)
-					resultStr = strings.Replace(resultStr, "/metadata/", "", 1)
-					resultStr = strings.Replace(resultStr, "//", "/", -1)
+		if len(folderFound) > 0 {
+			fmt.Printf("folder/file %s was found in:\n", searchSlice)
 
-					fmt.Println(resultStr)
-
-					dataNotFound = nil
-				}
+			for _, path := range folderFound {
+				fmt.Println(path)
 			}
+		} else {
+			fmt.Printf("folder/file %s was found in %s\n", searchSlice, pathString)
 		}
-
-		if dataNotFound != nil {
-			fmt.Println(dataNotFound)
-		}
-		os.Exit(0)
 	}
 
 	if *listVaults {
@@ -120,6 +113,10 @@ func main() {
 		}
 		fmt.Printf("\nfound %d \n", len(secrets))
 		os.Exit(0)
+	}
+
+	if dataNotFound != nil {
+		fmt.Println(dataNotFound)
 	}
 
 	fmt.Printf("\nfound %d\n", foundCount)

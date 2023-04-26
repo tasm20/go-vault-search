@@ -2,9 +2,11 @@ package main
 
 import (
 	"errors"
-	vault "github.com/hashicorp/vault/api"
+	"fmt"
 	"reflect"
 	"strings"
+
+	vault "github.com/hashicorp/vault/api"
 )
 
 var secrets []string
@@ -39,8 +41,13 @@ func getListVault(client *vault.Client, vaultPath []string, listVaults bool) err
 		}
 
 		secretsList, dirsList := loop(path, vaultList)
+
 		secrets = append(secrets, secretsList...)
 		dirs = append(dirs, dirsList...)
+	}
+
+	if len(folderFound) > 0 {
+		return nil
 	}
 
 	if len(dirs) > 0 {
@@ -60,6 +67,19 @@ func loop(vaultPath string, vaultList *vault.Secret) ([]string, []string) {
 
 			for i := 0; i < searchPathMap.Len(); i++ {
 				currentSearchPath := vaultPath + "/" + searchPathMap.Index(i).Interface().(string)
+
+				if *folderSearch {
+					for _, searchItem := range searchSlice {
+						if strings.Contains(currentSearchPath, searchItem) {
+							color := fmt.Sprintf("\x1b[%dm%s\x1b[0m", 32, searchItem)
+							coloredRes := strings.Replace(currentSearchPath, "metadata/", "", 1)
+							coloredRes = strings.Replace(coloredRes, "//", "/", -1)
+							coloredRes = strings.Replace(coloredRes, searchItem, color, -1)
+							folderFound = append(folderFound, coloredRes)
+						}
+					}
+				}
+
 				if strings.HasSuffix(currentSearchPath, "/") {
 					dirs = append(dirs, currentSearchPath)
 				} else {
