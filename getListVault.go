@@ -46,10 +46,6 @@ func getListVault(client *vault.Client, vaultPath []string, listVaults bool) err
 		dirs = append(dirs, dirsList...)
 	}
 
-	if len(folderFound) > 0 {
-		return nil
-	}
-
 	if len(dirs) > 0 {
 		_ = getListVault(client, dirs, false)
 	}

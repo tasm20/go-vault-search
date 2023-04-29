@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	version string = "0.3.5"
+	version string = "0.3.6"
 )
 
 // TODO: do search by folder/file - done, but still need to work on it
