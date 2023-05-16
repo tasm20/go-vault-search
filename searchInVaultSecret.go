@@ -34,7 +34,7 @@ func searchInVaultSecret(client *vault.Client) error {
 						fmt.Println(err)
 					}
 
-					_, ok := searchInSlice(secretKey)
+					_, ok := searchInSlice(k, secretKey)
 					if ok {
 						result := searchPath + "/" + vaultSecret + " - " + secretKey + " = " + string(jStr)
 						fmt.Println(result)
@@ -53,7 +53,7 @@ func searchInVaultSecret(client *vault.Client) error {
 			secretValue := string(jStr)
 
 			if *searchKey {
-				_, ok := searchInSlice(secretKey)
+				_, ok := searchInSlice(k, secretKey)
 				if ok {
 					result := searchPath + "/" + vaultSecret + " - " + secretKey + " = " + secretValue
 					fmt.Println(result)
@@ -63,7 +63,7 @@ func searchInVaultSecret(client *vault.Client) error {
 				continue
 			}
 
-			searchItem, ok := searchInSlice(secretValue)
+			searchItem, ok := searchInSlice(k, secretValue)
 			if ok {
 				for _, val := range searchItem {
 					coloredSecretValue := fmt.Sprintf("\x1b[%dm%s\x1b[0m", 32, val)
@@ -86,12 +86,19 @@ func searchInVaultSecret(client *vault.Client) error {
 	return dataNotFound
 }
 
-func searchInSlice(key string) ([]string, bool) {
-	var found []string
+func searchInSlice(key, value string) (map[string]string, bool) {
+	var found = make(map[string]string)
 
 	for _, v := range searchSlice {
-		if strings.Contains(key, v) {
-			found = append(found, v)
+		searchItemColor := fmt.Sprintf("\x1b[%dm%s\x1b[0m", 32, v)
+		if strings.Contains(value, v) {
+			_, ok := found[key]
+			if ok {
+				found[key] = strings.Replace(found[key], v, searchItemColor, -1)
+			} else {
+				value = strings.Replace(value, v, searchItemColor, -1)
+				found[key] = value
+			}
 		}
 	}
 
