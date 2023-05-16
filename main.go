@@ -4,13 +4,14 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 
 	vault "github.com/hashicorp/vault/api"
 )
 
 const (
-	version string = "0.3.7"
+	version string = "0.3.8"
 )
 
 // TODO: do search by folder/file - done, but still need to work on it
@@ -89,15 +90,13 @@ func main() {
 		}
 	}
 
-	if !*folderSearch && !*listVaults {
-		dataNotFound = searchInVaultSecret(client)
-	}
-
 	if *folderSearch {
 		if len(folderFound) > 0 {
 			fmt.Printf("folder/file %s was found in:\n\n", searchSlice)
 
 			for _, path := range folderFound {
+				regExp := regexp.MustCompile("//*")
+				path = regExp.ReplaceAllString(path, "/")
 				fmt.Println(path)
 			}
 		} else {
