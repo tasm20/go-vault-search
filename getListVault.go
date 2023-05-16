@@ -69,7 +69,6 @@ func loop(vaultPath string, vaultList *vault.Secret) ([]string, []string) {
 						if strings.Contains(currentSearchPath, searchItem) {
 							color := fmt.Sprintf("\x1b[%dm%s\x1b[0m", 32, searchItem)
 							coloredRes := strings.Replace(currentSearchPath, "metadata/", "", 1)
-							coloredRes = strings.Replace(coloredRes, "//", "/", -1)
 							coloredRes = strings.Replace(coloredRes, searchItem, color, -1)
 							folderFound = append(folderFound, coloredRes)
 						}

@@ -37,7 +37,6 @@ func searchInVaultSecret(client *vault.Client) error {
 					_, ok := searchInSlice(secretKey)
 					if ok {
 						result := searchPath + "/" + vaultSecret + " - " + secretKey + " = " + string(jStr)
-						result = strings.Replace(result, "//", "/", 1)
 						fmt.Println(result)
 						found = append(found, result)
 					}
@@ -57,7 +56,6 @@ func searchInVaultSecret(client *vault.Client) error {
 				_, ok := searchInSlice(secretKey)
 				if ok {
 					result := searchPath + "/" + vaultSecret + " - " + secretKey + " = " + secretValue
-					result = strings.Replace(result, "//", "/", 1)
 					fmt.Println(result)
 					found = append(found, result)
 				}
@@ -67,13 +65,14 @@ func searchInVaultSecret(client *vault.Client) error {
 
 			searchItem, ok := searchInSlice(secretValue)
 			if ok {
-				coloredSecretValue := fmt.Sprintf("\x1b[%dm%s\x1b[0m", 32, searchItem)
-				k = fmt.Sprintf("\u001B[%dm%s\u001B[0m", 33, k)
-				coloredResult := strings.Replace(secretValue, searchItem, coloredSecretValue, -1)
-				result := searchPath + "/" + vaultSecret + " - " + k + " = " + coloredResult
-				result = strings.Replace(result, "//", "/", -1)
-				fmt.Println(result)
-				found = append(found, result)
+				for _, val := range searchItem {
+					coloredSecretValue := fmt.Sprintf("\x1b[%dm%s\x1b[0m", 32, val)
+					k = fmt.Sprintf("\u001B[%dm%s\u001B[0m", 33, k)
+					coloredResult := strings.Replace(secretValue, val, coloredSecretValue, -1)
+					result := searchPath + "/" + vaultSecret + " - " + k + " = " + coloredResult
+					fmt.Println(result)
+					found = append(found, result)
+				}
 			}
 		}
 
@@ -87,11 +86,18 @@ func searchInVaultSecret(client *vault.Client) error {
 	return dataNotFound
 }
 
-func searchInSlice(key string) (string, bool) {
+func searchInSlice(key string) ([]string, bool) {
+	var found []string
+
 	for _, v := range searchSlice {
 		if strings.Contains(key, v) {
-			return v, true
+			found = append(found, v)
 		}
 	}
-	return "no", false
+
+	if len(found) > 0 {
+		return found, true
+	}
+
+	return nil, false
 }
