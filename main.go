@@ -76,9 +76,9 @@ func main() {
 
 	fmt.Println()
 
-	pathToSecret := checkFolder(client)
+	notFolder := checkFolder(client)
 
-	if !pathToSecret {
+	if !notFolder {
 		secrets = nil
 		pathString = pathString + "/"
 		path = append(path, pathString)
@@ -90,7 +90,7 @@ func main() {
 		}
 	}
 
-	if !*folderSearch && !*listVaults {
+	if !*folderSearch && !*listVaults && !notFolder {
 		dataNotFound = searchInVaultSecret(client)
 	}
 
