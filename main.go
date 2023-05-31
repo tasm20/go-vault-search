@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	version string = "0.4.1"
+	version string = "0.4.2"
 )
 
 // TODO: do search by folder/file - done, but still need to work on it
@@ -88,6 +88,10 @@ func main() {
 			fmt.Println(err)
 			os.Exit(2)
 		}
+	}
+
+	if !*folderSearch && !*listVaults {
+		dataNotFound = searchInVaultSecret(client)
 	}
 
 	if *folderSearch {
