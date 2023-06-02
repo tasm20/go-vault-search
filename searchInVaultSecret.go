@@ -55,7 +55,8 @@ func searchInVaultSecret(client *vault.Client) error {
 			if *searchKey {
 				_, ok := searchInSlice(k, secretKey)
 				if ok {
-					result := searchPath + "/" + vaultSecret + " - " + secretKey + " = " + secretValue
+					fmt.Println(searchPath + "/" + vaultSecret)
+					result := "\t" + secretKey + " = " + secretValue
 					fmt.Println(result)
 					found = append(found, result)
 				}
@@ -67,7 +68,9 @@ func searchInVaultSecret(client *vault.Client) error {
 			if ok {
 				for _, val := range searchItem {
 					k = fmt.Sprintf("\u001B[%dm%s\u001B[0m", 33, k)
-					result := searchPath + "/" + vaultSecret + " - " + k + " = " + val
+					k = strings.ReplaceAll(k, "//", "/")
+					result := "\t" + k + " = " + val
+					// result := searchPath + "/" + vaultSecret + " - " + k + " = " + val
 					fmt.Println(result)
 					found = append(found, result)
 				}
