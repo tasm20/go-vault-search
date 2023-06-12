@@ -69,6 +69,7 @@ func searchInVaultSecret(client *vault.Client) error {
 				for _, val := range searchItem {
 					k = fmt.Sprintf("\u001B[%dm%s\u001B[0m", 33, k)
 					k = strings.ReplaceAll(k, "//", "/")
+					fmt.Println(searchPath + "/" + vaultSecret)
 					result := "\t" + k + " = " + val
 					// result := searchPath + "/" + vaultSecret + " - " + k + " = " + val
 					fmt.Println(result)
