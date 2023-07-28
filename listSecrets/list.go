@@ -2,7 +2,6 @@ package listSecrets
 
 import (
 	"errors"
-	"fmt"
 	vault "github.com/hashicorp/vault/api"
 	"reflect"
 )
@@ -10,7 +9,6 @@ import (
 func ListVault(clientVault *vault.Client, path string) ([]string, error) {
 	listSecret, err := clientVault.Logical().List(path)
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 

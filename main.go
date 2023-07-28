@@ -6,6 +6,8 @@ import (
 	"github.com/tasm20/go-vault-search/initVault"
 	"github.com/tasm20/go-vault-search/listSecrets"
 	"github.com/tasm20/go-vault-search/loops"
+	"github.com/tasm20/go-vault-search/prints"
+	"github.com/tasm20/go-vault-search/search"
 	"os"
 	"strings"
 )
@@ -14,7 +16,7 @@ const (
 	version string = "1.0.0"
 )
 
-var (
+//var (
 //	searchKey    *bool
 //
 // searchSlice []string
@@ -22,7 +24,7 @@ var (
 //	foundCount   int
 //	folderSearch *bool
 //	folderFound  []string
-)
+//)
 
 //func checkFolder(client *vault.Client) bool {
 //	err := searchInVaultSecret(client)
@@ -35,7 +37,7 @@ func main() {
 
 	showVersion := flag.Bool("v", false, "version")
 	vaultPath := flag.String("p", "kv/", "path to vault secret start searching")
-	searchItem := flag.String("s", "", "what to search")
+	searchItems := flag.String("s", "", "what to search")
 	//searchKey = flag.Bool("k", false, "search secret key instead secret value")
 	folderSearch := flag.Bool("cat", false, "search folder or file")
 	listVaults := flag.Bool("l", false, "show only listSecrets of vaults in path")
@@ -49,17 +51,17 @@ func main() {
 
 	if *showVersion {
 		fmt.Println(version)
-		os.Exit(0)
+		return
 	}
 
-	if *searchItem == "" && !*listVaults {
+	if *searchItems == "" && !*listVaults {
 		fmt.Println("Use", os.Args[0], "-s string to search")
 		return
 	}
 
 	clientVault, err := initVault.InitVault()
 	if err != nil {
-		fmt.Println(err)
+		prints.ErrorPrint(err)
 		os.Exit(2)
 	}
 
@@ -70,65 +72,46 @@ func main() {
 	}
 
 	var searchSlice []string
-	searchSlice = append(searchSlice, *searchItem)
+	searchSlice = append(searchSlice, *searchItems)
 	searchArgs := flag.Args()
 	searchSlice = append(searchSlice, searchArgs...)
-
-	// New line for beauty
-	fmt.Println()
 
 	if *listVaults {
 		list, err := listSecrets.ListVault(clientVault, pathString)
 		if err != nil {
-			fmt.Println(err)
+			prints.ErrorPrint(err)
+			return
 		}
-		for _, l := range list {
-			fmt.Println(l)
-		}
+
+		prints.PrintList(list, pathString)
+
 		return
 	}
 
+	fmt.Println()
+	paths := loops.PathLoop(clientVault, pathString)
+
 	if *folderSearch {
-		//dirsCh := make(chan string)
-		for _, path := range <-loops.DirectoryLoop(clientVault, pathString) {
-			fmt.Println(path)
+		foundCh := make(chan string)
+		var wasFound bool
+
+		defer close(foundCh)
+		for _, path := range paths.GetDirs() {
+			go search.InPath(searchSlice, path, foundCh)
+			ok := prints.PrintFound(foundCh)
+			if ok {
+				wasFound = true
+			}
 		}
-		//for v := range dirsCh {
-		//close(dirsCh)
-		//}
-		//var listPaths []string
-		//list, err := listSecrets.ListVault(clientVault, pathString)
-		//if err != nil {
-		//	fmt.Println(err)
-		//}
-		//
-		//for _, dir := range list {
-		//	str := pathString + dir
-		//	listPaths = append(listPaths, str)
-		//}
-		////listPaths = append(listPaths, list...)
-		//for {
-		//	list, err := listSecrets.ListVault(clientVault, pathString)
-		//	if err != nil {
-		//		fmt.Println(err)
-		//	}
-		//	if len(list) == 0 {
-		//		break
-		//	}
-		//}
-		//
-		//pathCh := make(chan string)
-		//for _, dir := range listPaths {
-		//	go loops.DirectoryLoop(pathString, dir, pathCh)
-		//	search.SearchInPath(searchSlice, pathCh)
-		//}
-		//close(pathCh)
+
+		if !wasFound {
+			prints.NotFound()
+		}
+
 		return
 	}
 
 	//secrets = append(secrets, pathString)
-
-	fmt.Println()
 
 	//notFolder := checkFolder(client)
 
@@ -164,7 +147,7 @@ func main() {
 	//foundCount = len(folderFound)
 	//}
 
-	//if *listVaults {
+	//if *listVaults
 	//	pathString = strings.Replace(pathString, "metadata/", "", 1)
 	//	fmt.Printf("found dirs in %s:\n", pathString)
 	//	for _, secret := range secrets {
