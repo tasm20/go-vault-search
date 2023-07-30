@@ -9,7 +9,6 @@ import (
 )
 
 func GetSecrets(clientVault *vault.Client, val string) map[string]*api.KVSecret {
-	//for _, val := range paths.GetFiles() {
 	pathSlice := strings.Split(val, "/")
 	path := pathSlice[0]
 	path = strings.Replace(path, pathSlice[len(pathSlice)-1], "", 1)
@@ -25,5 +24,4 @@ func GetSecrets(clientVault *vault.Client, val string) map[string]*api.KVSecret 
 		secret: secretsDATA,
 	}
 	return secrets
-	//}
 }
