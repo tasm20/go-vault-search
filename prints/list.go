@@ -4,11 +4,6 @@ import (
 	"fmt"
 )
 
-const (
-	listFirstString = "in %s was found:\n"
-	tabSpace        = "    "
-)
-
 func PrintList(list []string, vaultPath string) {
 	if len(list) == 0 {
 		return

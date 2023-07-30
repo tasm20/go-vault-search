@@ -38,7 +38,7 @@ func main() {
 	showVersion := flag.Bool("v", false, "version")
 	vaultPath := flag.String("p", "kv/", "path to vault secret start searching")
 	searchItems := flag.String("s", "", "what to search")
-	//searchKey = flag.Bool("k", false, "search secret key instead secret value")
+	//searchKey := flag.Bool("k", false, "search secret key instead secret value")
 	folderSearch := flag.Bool("cat", false, "search folder or file")
 	listVaults := flag.Bool("l", false, "show only listSecrets of vaults in path")
 
@@ -111,6 +111,21 @@ func main() {
 		return
 	}
 
+	secretsDataCh := make(chan map[string]map[string][]byte)
+	defer close(secretsDataCh)
+	for _, path := range paths.GetFiles() {
+		//secretsList := make(chan map[string]string)
+		secrets := loops.GetSecrets(clientVault, path)
+		go loops.SecretsLoop(secrets, secretsDataCh)
+		//fmt.Println(<-secretsDataCh)
+
+		secretDATA := <-secretsDataCh
+		for k, _ := range secretDATA {
+			for kk, vv := range secretDATA[k] {
+				fmt.Printf("k - %s, kk - %s, vv - %s\n", k, kk, vv)
+			}
+		}
+	}
 	//secrets = append(secrets, pathString)
 
 	//notFolder := checkFolder(client)
