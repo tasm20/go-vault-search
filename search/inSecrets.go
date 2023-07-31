@@ -42,13 +42,17 @@ func innerSecretValueLoop(secretsMap map[string][]byte, innerCh chan map[string]
 }
 
 func searchSecrets(item string) string {
-	var found string
+	foundSlice := make(map[string]string)
 	for _, searchItem := range searchItems {
+		colorFoundItem := fmt.Sprintf("\x1b[%dm%s\x1b[0m", 32, searchItem)
 		if strings.Contains(item, searchItem) {
-			colorFoundItem := fmt.Sprintf("\x1b[%dm%s\x1b[0m", 32, searchItem)
-			colorResult := strings.Replace(item, searchItem, colorFoundItem, -1)
-			found = colorResult
+			_, ok := foundSlice[item]
+			if ok {
+				foundSlice[item] = strings.Replace(foundSlice[item], searchItem, colorFoundItem, -1)
+			} else {
+				foundSlice[item] = strings.Replace(item, searchItem, colorFoundItem, -1)
+			}
 		}
 	}
-	return found
+	return foundSlice[item]
 }

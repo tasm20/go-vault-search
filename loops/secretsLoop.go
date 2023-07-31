@@ -26,8 +26,7 @@ func innerSecretValueLoop(values *api.KVSecret, valueMapCh chan map[string][]byt
 		valuesInterface, ok := value.(map[string]interface{})
 		if ok {
 			go innerInterfaceLoop(valuesInterface, valueCh)
-			vJson = innerToJson(value)
-			close(valueCh)
+			vJson = innerToJson(<-valueCh)
 		} else {
 			vJson = innerToJson(value)
 		}
