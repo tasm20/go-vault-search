@@ -32,7 +32,7 @@ func PathLoop(clientVault *vault.Client, pathString string) PathStruct {
 			if !strings.Contains(path, "metadata") {
 				path = pathString + path
 			}
-			return PathLoop(clientVault, path)
+			PathLoop(clientVault, path)
 		}
 	}
 	return pathStruct
