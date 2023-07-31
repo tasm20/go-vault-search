@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/tasm20/go-vault-search/initVault"
 	"github.com/tasm20/go-vault-search/listSecrets"
 	"github.com/tasm20/go-vault-search/loops"
 	"github.com/tasm20/go-vault-search/prints"
@@ -43,12 +42,6 @@ func main() {
 		return
 	}
 
-	clientVault, err := initVault.InitVault()
-	if err != nil {
-		prints.ErrorPrint(err)
-		os.Exit(2)
-	}
-
 	pathString := *vaultPath
 
 	if !strings.Contains(pathString, "metadata") {
@@ -61,7 +54,7 @@ func main() {
 	searchSlice = append(searchSlice, searchArgs...)
 
 	if *listVaults {
-		list, err := listSecrets.ListVault(clientVault, pathString)
+		list, err := listSecrets.ListVault(pathString)
 		if err != nil {
 			prints.ErrorPrint(err)
 			return
@@ -73,7 +66,7 @@ func main() {
 	}
 
 	fmt.Println()
-	paths := loops.PathLoop(clientVault, pathString)
+	paths := loops.PathLoop(pathString)
 
 	if *folderSearch {
 		foundCh := make(chan string)
@@ -98,7 +91,7 @@ func main() {
 	secretsDataCh := make(chan map[string]map[string][]byte)
 	defer close(secretsDataCh)
 	for _, path := range paths.GetFiles() {
-		secrets := loops.GetSecrets(clientVault, path)
+		secrets := loops.GetSecrets(path)
 		go loops.SecretsLoop(secrets, secretsDataCh)
 		found := search.InSecrets(secretsDataCh, searchSlice, *searchKey)
 		prints.MapsOfFoundSecrets(found)

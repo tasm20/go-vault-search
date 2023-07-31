@@ -3,12 +3,12 @@ package loops
 import (
 	"context"
 	"github.com/hashicorp/vault/api"
-	vault "github.com/hashicorp/vault/api"
 	"github.com/tasm20/go-vault-search/prints"
 	"strings"
 )
 
-func GetSecrets(clientVault *vault.Client, val string) map[string]*api.KVSecret {
+func GetSecrets(val string) map[string]*api.KVSecret {
+
 	pathSlice := strings.Split(val, "/")
 	path := pathSlice[0]
 	path = strings.Replace(path, pathSlice[len(pathSlice)-1], "", 1)

@@ -1,13 +1,12 @@
 package loops
 
 import (
-	vault "github.com/hashicorp/vault/api"
 	"github.com/tasm20/go-vault-search/prints"
 	"reflect"
 	"strings"
 )
 
-func PathLoop(clientVault *vault.Client, pathString string) PathStruct {
+func PathLoop(pathString string) PathStruct {
 	var dirsCount []string
 	list, err := clientVault.Logical().List(pathString)
 	if err != nil {
@@ -32,7 +31,7 @@ func PathLoop(clientVault *vault.Client, pathString string) PathStruct {
 			if !strings.Contains(path, "metadata") {
 				path = pathString + path
 			}
-			PathLoop(clientVault, path)
+			PathLoop(path)
 		}
 	}
 	return pathStruct

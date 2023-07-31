@@ -2,11 +2,11 @@ package listSecrets
 
 import (
 	"errors"
-	vault "github.com/hashicorp/vault/api"
 	"reflect"
 )
 
-func ListVault(clientVault *vault.Client, path string) ([]string, error) {
+func ListVault(path string) ([]string, error) {
+
 	listSecret, err := clientVault.Logical().List(path)
 	if err != nil {
 		return nil, err
