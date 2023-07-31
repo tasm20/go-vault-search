@@ -1,10 +1,12 @@
 package loops
 
-import "strings"
+import (
+	"strings"
+)
 
-func NewPath(pathString string, list []string) []string {
+func NewPath(pathString string, inPathsCh, outPathsCh chan []string) {
 	var dirs []string
-	for _, dir := range list {
+	for _, dir := range <-inPathsCh {
 		newPath := pathString + dir
 
 		if strings.HasSuffix(newPath, "/") {
@@ -14,5 +16,5 @@ func NewPath(pathString string, list []string) []string {
 			pathStruct.files = append(pathStruct.files, newPath)
 		}
 	}
-	return dirs
+	outPathsCh <- dirs
 }

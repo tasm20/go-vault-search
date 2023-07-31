@@ -4,6 +4,7 @@ import (
 	vault "github.com/hashicorp/vault/api"
 	"github.com/tasm20/go-vault-search/prints"
 	"reflect"
+	"strings"
 )
 
 func PathLoop(clientVault *vault.Client, pathString string) PathStruct {
@@ -12,26 +13,36 @@ func PathLoop(clientVault *vault.Client, pathString string) PathStruct {
 	if err != nil {
 		prints.ErrorPrint(err)
 	}
+	inPathsCh := make(chan []string)
+	defer close(inPathsCh)
 	for _, lisMap := range list.Data {
 		paths := reflect.ValueOf(lisMap)
-		newPaths := innerPathLoop(paths)
-		dirs := NewPath(pathString, newPaths)
-		dirsCount = append(dirsCount, dirs...)
+		go innerPathLoop(paths, inPathsCh)
+		outPathsCh := make(chan []string)
+		go NewPath(pathString, inPathsCh, outPathsCh)
+		dirs := <-outPathsCh
+		if dirs != nil {
+			dirsCount = append(dirsCount, dirs...)
+		}
+		close(outPathsCh)
 	}
 
 	if len(dirsCount) > 0 {
-		for _, t := range dirsCount {
-			PathLoop(clientVault, t)
+		for _, path := range dirsCount {
+			if !strings.Contains(path, "metadata") {
+				path = pathString + path
+			}
+			return PathLoop(clientVault, path)
 		}
 	}
 	return pathStruct
 }
 
-func innerPathLoop(pathsIn reflect.Value) []string {
+func innerPathLoop(pathsIn reflect.Value, newPathCh chan []string) {
 	var pathOut []string
 	for i := 0; i < pathsIn.Len(); i++ {
 		pathOut = append(pathOut, pathsIn.Index(i).Interface().(string))
 	}
 
-	return pathOut
+	newPathCh <- pathOut
 }
