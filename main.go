@@ -11,6 +11,8 @@ import (
 	"strings"
 )
 
+// TODO: do a show version without VAULT addr and TOKEN
+
 const (
 	version string = "1.0.0"
 )
