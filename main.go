@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/hashicorp/vault/api"
 	"github.com/tasm20/go-vault-search/listSecrets"
 	"github.com/tasm20/go-vault-search/loops"
 	"github.com/tasm20/go-vault-search/prints"
@@ -69,57 +68,16 @@ func main() {
 	fmt.Println()
 	paths, secrets := loops.GetList(pathString)
 
-	// If folder search
 	if *folderSearch && paths.GetDirs() != nil {
-		searchInFolder(paths, searchSlice)
+		search.ByFolder(paths, searchSlice)
 		return
 	}
 
 	if secrets != nil {
-		searchSecrets(secrets, searchSlice, *searchKey)
+		search.InSecretsMap(secrets, searchSlice, *searchKey)
 	} else {
-		searchInSecrets(paths, searchSlice, *searchKey)
-	}
-	return
-
-}
-
-// TEMP functions for resolve problem
-func searchInFolder(paths loops.PathStruct, searchSlice []string) {
-	foundCh := make(chan string)
-	var wasFound bool
-
-	defer close(foundCh)
-	for _, path := range paths.GetDirs() {
-		go search.InPath(searchSlice, path, foundCh)
-		ok := prints.PrintFound(foundCh)
-		if ok {
-			wasFound = true
-		}
-	}
-
-	if !wasFound {
-		prints.NotFound()
+		search.InSecretsPath(paths, searchSlice, *searchKey)
 	}
 
 	return
-}
-
-func searchSecrets(secrets map[string]*api.KVSecret, searchSlice []string, searchKey bool) {
-	secretsDataCh := make(chan map[string]map[string][]byte)
-	go loops.SecretsLoop(secrets, secretsDataCh)
-	found := search.InSecrets(secretsDataCh, searchSlice, searchKey)
-	prints.MapsOfFoundSecrets(found)
-	defer close(secretsDataCh)
-}
-
-func searchInSecrets(paths loops.PathStruct, searchSlice []string, searchKey bool) {
-	secretsDataCh := make(chan map[string]map[string][]byte)
-	for _, path := range paths.GetFiles() {
-		secrets := loops.GetSecrets(path)
-		go loops.SecretsLoop(secrets, secretsDataCh)
-		found := search.InSecrets(secretsDataCh, searchSlice, searchKey)
-		prints.MapsOfFoundSecrets(found)
-	}
-	defer close(secretsDataCh)
 }
