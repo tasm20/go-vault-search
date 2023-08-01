@@ -1,17 +1,30 @@
 package loops
 
 import (
+	"github.com/hashicorp/vault/api"
 	"github.com/tasm20/go-vault-search/prints"
 	"reflect"
 	"strings"
 )
 
-func PathLoop(pathString string) PathStruct {
-	var dirsCount []string
+func GetList(pathString string) (PathStruct, map[string]*api.KVSecret) {
 	list, err := clientVault.Logical().List(pathString)
 	if err != nil {
 		prints.ErrorPrint(err)
 	}
+
+	var secrets map[string]*api.KVSecret
+	if list != nil {
+		pathStruct = pathLoop(list, pathString)
+		return pathStruct, secrets
+	} else {
+		secrets = GetSecrets(pathString)
+	}
+	return pathStruct, secrets
+}
+
+func pathLoop(list *api.Secret, pathString string) PathStruct {
+	var dirsCount []string
 	inPathsCh := make(chan []string)
 	defer close(inPathsCh)
 	for _, lisMap := range list.Data {
@@ -31,7 +44,7 @@ func PathLoop(pathString string) PathStruct {
 			if !strings.Contains(path, "metadata") {
 				path = pathString + path
 			}
-			PathLoop(path)
+			GetList(path)
 		}
 	}
 	return pathStruct

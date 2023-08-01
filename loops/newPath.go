@@ -7,6 +7,9 @@ import (
 func NewPath(pathString string, inPathsCh, outPathsCh chan []string) {
 	var dirs []string
 	for _, dir := range <-inPathsCh {
+		if !strings.HasSuffix(pathString, "/") {
+			pathString += "/"
+		}
 		newPath := pathString + dir
 
 		if strings.HasSuffix(newPath, "/") {
