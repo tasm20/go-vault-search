@@ -11,8 +11,6 @@ import (
 	"strings"
 )
 
-// TODO: do a notFound for key and value search
-
 const (
 	version string = "1.0.0"
 )
@@ -73,11 +71,16 @@ func main() {
 		return
 	}
 
+	var wasNotFound bool
+
 	if secrets != nil {
-		search.InSecretsMap(secrets, searchSlice, *searchKey)
+		wasNotFound = search.InSecretsMap(secrets, searchSlice, *searchKey)
 	} else {
-		search.InSecretsPath(paths, searchSlice, *searchKey)
+		wasNotFound = search.InSecretsPath(paths, searchSlice, *searchKey)
 	}
 
+	if wasNotFound {
+		prints.NotFound()
+	}
 	return
 }
