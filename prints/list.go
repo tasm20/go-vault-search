@@ -11,6 +11,8 @@ func PrintList(list []string, vaultPath string) {
 	}
 
 	vaultPath = strings.Replace(vaultPath, "kv/metadata", "kv", 1)
+	vaultPath = strings.Replace(vaultPath, "//", "/", -1)
+
 	fmt.Printf("\n"+listFirstString, vaultPath)
 	for _, item := range list {
 		fmt.Printf("%s%s\n", tabSpace, item)
