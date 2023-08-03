@@ -70,6 +70,7 @@ func main() {
 
 	if *folderSearch && paths.GetDirs() != nil {
 		search.ByFolder(paths, searchSlice)
+		checkFound()
 		return
 	}
 
@@ -79,9 +80,13 @@ func main() {
 		search.InSecretsPath(paths, searchSlice, *searchKey)
 	}
 
+	checkFound()
+
+	return
+}
+
+func checkFound() {
 	if search.FoundCount == 0 {
 		prints.NotFound()
 	}
-
-	return
 }

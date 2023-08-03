@@ -4,12 +4,9 @@ import (
 	"fmt"
 )
 
-func PrintFound(foundCh chan string) bool {
+func PrintFound(foundCh chan string) {
 	found := <-foundCh
-	if found == "" {
-		return false
+	if found != "" {
+		fmt.Println(found)
 	}
-
-	fmt.Println(found)
-	return true
 }
