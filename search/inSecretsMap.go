@@ -6,19 +6,14 @@ import (
 	"github.com/tasm20/go-vault-search/prints"
 )
 
-func InSecretsMap(secrets map[string]*api.KVSecret, searchSlice []string, searchKey bool) bool {
+func InSecretsMap(secrets map[string]*api.KVSecret, searchSlice []string, searchKey bool) {
 	secretsDataCh := make(chan map[string]map[string][]byte)
-	var wasNotFound bool
 
 	go loops.SecretsLoop(secrets, secretsDataCh)
 	found := InSecrets(secretsDataCh, searchSlice, searchKey)
 
-	if len(found) > 0 {
+	if FoundCount > 0 {
 		prints.MapsOfFoundSecrets(found)
-		wasNotFound = false
-	} else {
-		wasNotFound = true
 	}
 	defer close(secretsDataCh)
-	return wasNotFound
 }

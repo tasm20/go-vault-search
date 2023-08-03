@@ -46,6 +46,7 @@ func searchSecrets(item string) string {
 	for _, searchItem := range searchItems {
 		colorFoundItem := fmt.Sprintf("\x1b[%dm%s\x1b[0m", 32, searchItem)
 		if strings.Contains(item, searchItem) {
+			FoundCount++
 			_, ok := foundSlice[item]
 			if ok {
 				foundSlice[item] = strings.Replace(foundSlice[item], searchItem, colorFoundItem, -1)

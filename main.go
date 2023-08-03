@@ -14,7 +14,7 @@ import (
 // TODO: do a show version without VAULT addr and TOKEN
 
 const (
-	version string = "1.0.2"
+	version string = "1.0.3"
 )
 
 func main() {
@@ -73,16 +73,15 @@ func main() {
 		return
 	}
 
-	var wasNotFound bool
-
 	if secrets != nil {
-		wasNotFound = search.InSecretsMap(secrets, searchSlice, *searchKey)
+		search.InSecretsMap(secrets, searchSlice, *searchKey)
 	} else {
-		wasNotFound = search.InSecretsPath(paths, searchSlice, *searchKey)
+		search.InSecretsPath(paths, searchSlice, *searchKey)
 	}
 
-	if wasNotFound {
+	if search.FoundCount == 0 {
 		prints.NotFound()
 	}
+
 	return
 }
