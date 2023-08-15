@@ -52,25 +52,6 @@ func innerSecretValueLoop(values map[string]interface{}, valueMapCh chan map[str
 	valueMapCh <- newMap
 }
 
-//func innerSecretValueLoop(values *api.KVSecret, valueMapCh chan map[string][]byte) {
-//	var newMap = make(map[string][]byte)
-//
-//	for key, value := range values.Data {
-//		var vJson []byte
-//		valueCh := make(chan interface{})
-//		valuesInterface, ok := value.(map[string]interface{})
-//		if ok {
-//			go innerInterfaceLoop(valuesInterface, valueCh)
-//			vJson = innerToJson(<-valueCh)
-//		} else {
-//			vJson = innerToJson(value)
-//		}
-//		newMap[key] = vJson
-//	}
-//
-//	valueMapCh <- newMap
-//}
-
 func innerInterfaceLoop(values map[string]interface{}, valueCh chan interface{}) {
 	for _, value := range values {
 		valueCh <- value
