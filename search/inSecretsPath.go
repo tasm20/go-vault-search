@@ -9,7 +9,7 @@ func InSecretsPath(paths loops.PathStruct, searchSlice []string, searchKey bool)
 	secretsDataCh := make(chan map[string]map[string][]byte)
 
 	for _, path := range paths.GetFiles() {
-		secrets := loops.GetSecrets(path)
+		secrets, _ := loops.GetSecrets(path)
 		go loops.SecretsLoop(secrets, secretsDataCh)
 		found := InSecrets(secretsDataCh, searchSlice, searchKey)
 

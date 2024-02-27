@@ -8,13 +8,12 @@ import (
 	"github.com/tasm20/go-vault-search/prints"
 	"github.com/tasm20/go-vault-search/search"
 	"os"
-	"strings"
 )
 
 // TODO: do a show version without VAULT addr and TOKEN
 
 const (
-	version string = "1.0.4"
+	version string = "1.1.0"
 )
 
 func main() {
@@ -44,10 +43,6 @@ func main() {
 
 	pathString := *vaultPath
 
-	if !strings.Contains(pathString, "metadata") {
-		pathString = strings.Replace(pathString, "kv", "kv/metadata", 1)
-	}
-
 	var searchSlice []string
 	searchSlice = append(searchSlice, *searchItems)
 	searchArgs := flag.Args()
@@ -66,6 +61,7 @@ func main() {
 	}
 
 	fmt.Println()
+	pathString = listSecrets.AddMeta(pathString)
 	paths, secrets := loops.GetList(pathString)
 
 	if *folderSearch && paths.GetDirs() != nil {

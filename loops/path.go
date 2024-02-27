@@ -18,7 +18,7 @@ func GetList(pathString string) (PathStruct, map[string]*api.KVSecret) {
 		pathStruct = pathLoop(list, pathString)
 		return pathStruct, secrets
 	} else {
-		secrets = GetSecrets(pathString)
+		secrets, _ = GetSecrets(pathString)
 	}
 	return pathStruct, secrets
 }

@@ -2,11 +2,22 @@ package listSecrets
 
 import (
 	"errors"
+	"github.com/tasm20/go-vault-search/loops"
+	"github.com/tasm20/go-vault-search/prints"
 	"reflect"
 )
 
 func ListVault(path string) ([]string, error) {
 
+	listSecrets, err := loops.GetSecrets(path)
+	if err == nil {
+		for key, val := range listSecrets {
+			prints.PrintAllinPath(key, val.Data)
+		}
+		return nil, nil
+	}
+
+	path = AddMeta(path)
 	listSecret, err := clientVault.Logical().List(path)
 	if err != nil {
 		return nil, err
@@ -27,6 +38,8 @@ func ListVault(path string) ([]string, error) {
 				pathString := searchPathMap.Index(i).Interface().(string)
 				listMap = append(listMap, pathString)
 			}
+		default:
+			panic("unhandled default case")
 		}
 	}
 
