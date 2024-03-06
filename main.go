@@ -13,7 +13,7 @@ import (
 // TODO: do a show version without VAULT addr and TOKEN
 
 const (
-	version string = "1.1.0"
+	version string = "1.1.1"
 )
 
 func main() {

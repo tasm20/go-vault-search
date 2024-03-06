@@ -53,9 +53,11 @@ func innerSecretValueLoop(values map[string]interface{}, valueMapCh chan map[str
 }
 
 func innerInterfaceLoop(values map[string]interface{}, valueCh chan interface{}) {
-	for _, value := range values {
-		valueCh <- value
+	var newMap = make(map[string]interface{})
+	for key, value := range values {
+		newMap[key] = value
 	}
+	valueCh <- newMap
 }
 
 func innerToJson(value interface{}) []byte {
