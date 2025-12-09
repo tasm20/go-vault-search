@@ -1,10 +1,11 @@
 package loops
 
 import (
-	"github.com/hashicorp/vault/api"
-	"github.com/tasm20/go-vault-search/prints"
 	"reflect"
 	"strings"
+
+	"github.com/hashicorp/vault/api"
+	"github.com/tasm20/go-vault-search/prints"
 )
 
 func GetList(pathString string) (PathStruct, map[string]*api.KVSecret) {
@@ -17,9 +18,9 @@ func GetList(pathString string) (PathStruct, map[string]*api.KVSecret) {
 	if list != nil {
 		pathStruct = pathLoop(list, pathString)
 		return pathStruct, secrets
-	} else {
-		secrets, _ = GetSecrets(pathString)
 	}
+
+	secrets, _ = GetSecrets(pathString)
 	return pathStruct, secrets
 }
 

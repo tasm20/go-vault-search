@@ -1,9 +1,10 @@
 package initVault
 
 import (
+	"os"
+
 	vault "github.com/hashicorp/vault/api"
 	"github.com/tasm20/go-vault-search/prints"
-	"os"
 )
 
 func GetClient() *vault.Client {

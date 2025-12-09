@@ -2,9 +2,10 @@ package listSecrets
 
 import (
 	"errors"
+	"reflect"
+
 	"github.com/tasm20/go-vault-search/loops"
 	"github.com/tasm20/go-vault-search/prints"
-	"reflect"
 )
 
 func ListVault(path string) ([]string, error) {

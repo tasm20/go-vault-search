@@ -3,17 +3,18 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
+
 	"github.com/tasm20/go-vault-search/listSecrets"
 	"github.com/tasm20/go-vault-search/loops"
 	"github.com/tasm20/go-vault-search/prints"
 	"github.com/tasm20/go-vault-search/search"
-	"os"
 )
 
 // TODO: do a show version without VAULT addr and TOKEN
 
 const (
-	version string = "1.1.1"
+	version string = "20251209"
 )
 
 func main() {

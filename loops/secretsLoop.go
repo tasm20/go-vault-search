@@ -2,6 +2,7 @@ package loops
 
 import (
 	"encoding/json"
+
 	"github.com/hashicorp/vault/api"
 	"github.com/tasm20/go-vault-search/prints"
 )

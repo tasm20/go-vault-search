@@ -2,8 +2,9 @@ package loops
 
 import (
 	"context"
-	"github.com/hashicorp/vault/api"
 	"strings"
+
+	"github.com/hashicorp/vault/api"
 )
 
 func GetSecrets(val string) (map[string]*api.KVSecret, error) {

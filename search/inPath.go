@@ -2,8 +2,9 @@ package search
 
 import (
 	"fmt"
-	"github.com/tasm20/go-vault-search/loops"
 	"strings"
+
+	"github.com/tasm20/go-vault-search/loops"
 )
 
 func InPath(searchSlice []string, pathItem string, found chan string) {
