@@ -7,6 +7,10 @@ import (
 	"github.com/tasm20/go-vault-search/prints"
 )
 
+var (
+	PlainTEXT = false
+)
+
 func kvSecretsToMap(secretsList *api.KVSecret) map[string]interface{} {
 	res := make(map[string]interface{})
 	for keyList, value := range secretsList.Data {
@@ -62,6 +66,9 @@ func innerInterfaceLoop(values map[string]interface{}, valueCh chan interface{})
 }
 
 func innerToJson(value interface{}) []byte {
+	if PlainTEXT {
+		return []byte(value.(string))
+	}
 	vJson, err := json.MarshalIndent(value, "", " ")
 	if err != nil {
 		prints.ErrorPrint(err)

@@ -14,7 +14,7 @@ import (
 // TODO: do a show version without VAULT addr and TOKEN
 
 const (
-	version string = "20251209"
+	version string = "2025120901"
 )
 
 func main() {
@@ -24,6 +24,7 @@ func main() {
 	searchKey := flag.Bool("k", false, "search secret key instead secret value")
 	folderSearch := flag.Bool("cat", false, "search folder or file")
 	listVaults := flag.Bool("l", false, "show only listSecrets of vaults in path")
+	plainTEXTout := flag.Bool("plain", false, "plain output without json")
 
 	flag.Parse()
 
@@ -35,6 +36,10 @@ func main() {
 	if *showVersion {
 		fmt.Println(version)
 		return
+	}
+
+	if *plainTEXTout {
+		loops.PlainTEXT = true
 	}
 
 	if *searchItems == "" && !*listVaults {
