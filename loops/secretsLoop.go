@@ -2,6 +2,7 @@ package loops
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/hashicorp/vault/api"
 	"github.com/tasm20/go-vault-search/prints"
@@ -48,8 +49,21 @@ func innerSecretValueLoop(values map[string]interface{}, valueMapCh chan map[str
 		if ok {
 			go innerInterfaceLoop(valuesInterface, valueCh)
 			vJson = innerToJson(<-valueCh)
-		} else {
+		} else if !PlainTEXT {
 			vJson = innerToJson(value)
+		} else {
+			switch v := value.(type) {
+			case []byte:
+				vJson = v
+			case string:
+				vJson = []byte(v)
+			case []interface{}:
+				vJson = innerToJson(v)
+			case map[string]interface{}:
+				vJson = innerToJson(v)
+			default:
+				vJson = []byte(fmt.Sprint(v))
+			}
 		}
 		newMap[key] = vJson
 	}
@@ -66,9 +80,6 @@ func innerInterfaceLoop(values map[string]interface{}, valueCh chan interface{})
 }
 
 func innerToJson(value interface{}) []byte {
-	if PlainTEXT {
-		return []byte(value.(string))
-	}
 	vJson, err := json.MarshalIndent(value, "", " ")
 	if err != nil {
 		prints.ErrorPrint(err)
