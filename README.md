@@ -1,6 +1,6 @@
 # go-vault-search
 
-A command-line tool to search through HashiCorp Vault KV v2 secrets by key or value.
+A command-line tool to search HashiCorp Vault KV v2 secrets by key, value, or path.
 
 ## Prerequisites
 
@@ -28,6 +28,9 @@ This creates binaries for multiple platforms:
 - `go-vault-search_amd64_linux`
 - `go-vault-search_arm64_darwin`
 
+The build script is self-contained: it can be run from any directory and writes
+the binaries into the repository directory.
+
 ## Usage
 
 ```
@@ -37,19 +40,21 @@ Flags:
   -s string
         what to search (required unless using -l)
   -p string
-        path to vault secret start searching (default "kv/")
+        Vault KV path to start searching (default "kv/")
   -k    search secret key instead of secret value
-  -l    show only list of vaults in path
-  -cat  search folder or file
+  -l    list folders/files in path
+  -cat  search folder/file paths instead of secret values
   -plain
-        output in plain text format (not json as default output)
+        output secret values as plain text instead of JSON-style formatting
   -v    version
 ```
 
 ### Important Notes
-- The `-k` and `-l` flags should be placed at the beginning
-- The `-s` flag (search item) should be at the end when using multiple search terms
-- Supports multiple search terms: `-s term1 term2 term3`
+- Requires `VAULT_ADDR` and `VAULT_TOKEN` to be set.
+- Supports multiple search terms: `-s term1 term2 term3`.
+- `-k` searches secret keys. Without `-k`, the app searches secret values.
+- `-cat` searches Vault folder/file paths, including the exact path passed with `-p`.
+- `-l` lists the contents of a single path and does not require `-s`.
 
 ## Examples
 
@@ -57,66 +62,67 @@ Flags:
 ```bash
 ❯ go-vault-search -s 124
 
-kv/TEST - third = qwe124
-kv/TEST2 - third = 124
-kv/TEST23 - third = 124
+Found in: /apps/example-api
+        third: "qwe124"
 
-found 3
+Found in: /apps/example-worker
+        third: "124"
 ```
 
 ### Search in specific path
 ```bash
-❯ go-vault-search -p kv/TEST2 -s 125
+❯ go-vault-search -p kv/apps/example-worker -s 125
 
-kv/TEST2/tt - foru = 125
-
-found 1
+Found in: /apps/example-worker/config
+        port: "125"
 ```
 
 ### Search by secret key
 ```bash
-❯ go-vault-search -p kv/ -k -s fo
+❯ go-vault-search -p kv/ -k -s API
 
-kv/TEST2/tt - foru = 125
-kv/TEST3/t2/qwe - for = 122
-kv/TEST3/tt/qwe - foru = 122
+Found in: /apps/example-api
+        API_TOKEN: "redacted"
 
-found 3
+Found in: /apps/example-worker
+        API_URL: "https://api.example.com"
 ```
 
 ### List folders/files in path
 ```bash
-❯ go-vault-search -p kv/TEST2 -l
+❯ go-vault-search -p kv/apps -l
 
-in kv/TEST2 was found:
-    tt
-
-found 1
+in kv/apps was found:
+    example-api
+    example-worker
 ```
 
 ### List folders/files in default path
 ```bash
 ❯ go-vault-search -l
 
-found dirs in kv/:
-    TEST
-    TEST2
-    TEST2/
-    TEST23
-    TEST3/
+in kv/ was found:
+    apps/
+    platform/
+    shared/
+```
 
-found 5
+### Search folder/file paths
+```bash
+❯ go-vault-search -p kv/apps/example-api/config -cat -s example-api
+
+kv/apps/example-api/config
 ```
 
 ### Plain text output (no colors)
 ```bash
-❯ go-vault-search -plain -s 124 
+❯ go-vault-search -plain -s 124
 
-kv/TEST - third = qwe124
-kv/TEST2 - third = 124
-kv/TEST23 - third = 124
+Found in: /apps/example-api
+        third: qwe124
 
-found 3
+Found in: /apps/example-worker
+        third: 124
 ```
 
 ### Multiple search terms
@@ -124,6 +130,12 @@ found 3
 ❯ go-vault-search -s password token secret
 
 # Searches for all three terms across vault secrets
+```
+
+### Environment variable example
+```bash
+VAULT_ADDR=https://vault.example.com VAULT_TOKEN=your-vault-token \
+  go-vault-search -p kv/apps/example-api -k -s API_TOKEN
 ```
 
 ## Limitations
