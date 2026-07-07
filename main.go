@@ -14,7 +14,7 @@ import (
 // TODO: do a show version without VAULT addr and TOKEN
 
 const (
-	version string = "2025121701"
+	version string = "2026070701"
 )
 
 func main() {

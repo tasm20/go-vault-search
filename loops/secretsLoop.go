@@ -15,7 +15,12 @@ var (
 func kvSecretsToMap(secretsList *api.KVSecret) map[string]interface{} {
 	res := make(map[string]interface{})
 	for keyList, value := range secretsList.Data {
-		if mapSecrets, ok := value.(map[string]interface{}); ok {
+		if keyList == "data" && len(secretsList.Data) == 1 {
+			mapSecrets, ok := value.(map[string]interface{})
+			if !ok {
+				res[keyList] = value
+				continue
+			}
 			for keySecrets, valueSecrets := range mapSecrets {
 				res[keySecrets] = valueSecrets
 			}
