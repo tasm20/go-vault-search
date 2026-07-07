@@ -14,7 +14,7 @@ import (
 // TODO: do a show version without VAULT addr and TOKEN
 
 const (
-	version string = "2026070701"
+	version string = "2026070702"
 )
 
 func main() {
@@ -70,8 +70,8 @@ func main() {
 	pathString = listSecrets.AddMeta(pathString)
 	paths, secrets := loops.GetList(pathString)
 
-	if *folderSearch && paths.GetDirs() != nil {
-		search.ByFolder(paths, searchSlice)
+	if *folderSearch {
+		search.ByFolder(paths, pathString, searchSlice)
 		checkFound()
 		return
 	}

@@ -8,15 +8,23 @@ import (
 )
 
 func InPath(searchSlice []string, pathItem string, found chan string) {
+	res := loops.RemoveExtrasInPath(pathItem)
+	colorResult := res
+	matched := false
+
 	for _, searchItem := range searchSlice {
-		if strings.Contains(pathItem, searchItem) {
+		if strings.Contains(res, searchItem) {
 			FoundCount++
-			res := loops.RemoveExtrasInPath(pathItem)
 			colorFoundItem := fmt.Sprintf("\x1b[%dm%s\x1b[0m", 32, searchItem)
-			colorResult := strings.Replace(res, searchItem, colorFoundItem, -1)
-			found <- colorResult
-		} else {
-			found <- ""
+			colorResult = strings.Replace(colorResult, searchItem, colorFoundItem, -1)
+			matched = true
 		}
 	}
+
+	if !matched {
+		found <- ""
+		return
+	}
+
+	found <- colorResult
 }
